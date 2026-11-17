@@ -107,15 +107,23 @@ La base de datos en memoria se inicializa con los siguientes usuarios de prueba:
 
 | Usuario | Contraseña | Rol | Cuentas Asignadas |
 | :--- | :--- | :--- | :--- |
-| `admin` | `admin123` | Administrador del Sistema | Ninguna (gestión global) |
-| `auditor_seguridad` | `audit2026` | Auditor Forense | Acceso de auditoría |
-| `carlos_mora` | `carlos2026` | Cliente Bancario | `CTA-CR-1001` (Ahorros CRC), `CTA-CR-1002` (Dólares USD) |
-| `maria_rojas` | `maria2026` | Cliente Bancario | `CTA-CR-2001` (Ahorros CRC) |
-| `juan_perez` | `juan2026` | Cliente Bancario | `CTA-CR-3001` (Ahorros CRC) |
+| `admin` | `admin123` | Administrador del Sistema | ID 1 `CR05015202001026458900` (Corriente CRC) |
+| `auditor_seguridad` | `auditor2026` | Auditor Forense | Ninguna (lectura de todas las cuentas) |
+| `carlos_mora` | `carlos123` | Cliente Bancario | ID 2 `CR05015202001026458901` (Ahorros CRC) |
+| `maria_rojas` | `maria123` | Cliente Bancario | ID 3 `CR05015202001026458902` (Corriente CRC) |
+| `juan_perez` | `juan123` | Cliente Bancario | ID 4 `CR05015202001026458903` (Ahorros CRC) |
+
+> Tras la remediación, `data.sql` almacena estas contraseñas únicamente como hashes **BCrypt** (`$2a$12$...`). La tabla anterior es solo una referencia para el laboratorio.
 
 ---
 
 ## 5. Acceso a la Consola de Base de Datos H2
+
+La consola está **deshabilitada por defecto** y nunca acepta conexiones remotas. Para habilitarla solo en su equipo local:
+
+```powershell
+$env:H2_CONSOLE_ENABLED = "true"; .\mvnw.cmd spring-boot:run
+```
 
 Para inspeccionar las tablas (`USUARIOS`, `CUENTAS_BANCARIAS`, `TRANSACCIONES`):
 
@@ -131,13 +139,52 @@ Para inspeccionar las tablas (`USUARIOS`, `CUENTAS_BANCARIAS`, `TRANSACCIONES`):
 
 ## 6. Endpoints Clave para la Auditoría
 
-| Método | Endpoint | Descripción | Vector de Auditoría |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/login` | Autenticación con JWT | Credenciales en texto plano / Weak Secret |
-| `GET` | `/api/cuentas/{id}` | Consulta de cuenta por ID | Vulnerable a **IDOR / BOLA** |
-| `GET` | `/api/cuentas/{id}/saldo`| Consulta directa de saldo | Vulnerable a **IDOR / BOLA** |
-| `GET` | `/api/transacciones/buscar` | Búsqueda por término | Vulnerable a **SQL Injection (SQLi)** |
-| `POST` | `/api/transacciones/transferir` | Ejecución de transferencia | Vulnerable a **IDOR** y **Stored XSS** |
+Todos los endpoints (excepto el login) exigen la cabecera `Authorization: Bearer <token>`.
+
+| Método | Endpoint | Descripción | Vector original | Estado tras la remediación |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/login` | Autenticación con JWT | Credenciales en texto plano / Weak Secret | BCrypt + 401 genérico |
+| `GET` | `/api/cuentas/{id}` | Consulta de cuenta por ID | **IDOR / BOLA** | 403 si la cuenta es ajena |
+| `GET` | `/api/cuentas/{id}/saldo`| Consulta directa de saldo | **IDOR / BOLA** | 403 si la cuenta es ajena |
+| `GET` | `/api/transacciones/buscar` | Búsqueda por término | **SQL Injection (SQLi)** | JPQL parametrizado |
+| `POST` | `/api/transacciones/transferir` | Ejecución de transferencia | **IDOR** y **Stored XSS** | 403 si el origen es ajeno; concepto codificado |
+
+La auditoría completa (fichas CWE/CVSS, PoC y evidencias antes/después) está en [docs/BITACORA_PERICIAL.md](docs/BITACORA_PERICIAL.md).
+
+---
+
+## 6.1 Variables de Entorno (Configuración Segura)
+
+El backend no contiene secretos en el repositorio. Copie `backend/.env.example` como referencia y defina, como mínimo, el secreto JWT (≥ 256 bits):
+
+```powershell
+# PowerShell
+$b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b)
+$env:JWT_SECRET = [Convert]::ToBase64String($b)
+.\mvnw.cmd spring-boot:run
+```
+
+```bash
+# Bash
+export JWT_SECRET="$(openssl rand -base64 48)"
+./mvnw spring-boot:run
+```
+
+Si `JWT_SECRET` no está definida, el backend genera una clave aleatoria en cada arranque (las sesiones se invalidan al reiniciar). Un valor de menos de 32 bytes impide que la aplicación arranque.
+
+| Variable | Valor por defecto | Uso |
+| :--- | :--- | :--- |
+| `JWT_SECRET` | *(aleatoria efímera)* | Firma HMAC-SHA256 de los tokens |
+| `JWT_EXPIRATION_MS` | `3600000` | Vigencia del token (1 hora) |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:4200` | Orígenes permitidos |
+| `H2_CONSOLE_ENABLED` | `false` | Consola H2 (solo local) |
+
+### Pruebas de regresión de seguridad
+
+```powershell
+cd backend
+mvn clean test   # 10 pruebas: una por cada PoC de la auditoría + carga del contexto
+```
 
 ---
 
