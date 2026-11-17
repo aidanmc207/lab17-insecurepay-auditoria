@@ -23,8 +23,8 @@ public class Transaccion {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal monto;
 
-    // [VULNERABILIDAD INTENCIONADA: A03:2021 - Injection (Stored XSS)]
-    // Almacena cadenas HTML y scripts arbitrarios en la base de datos sin sanitizar
+    // [REMEDIACION A03:2021 - Stored XSS]
+    // Se persiste como texto con caracteres HTML codificados (TransaccionService.sanitizarTexto)
     @Lob
     @Column(name = "concepto_html")
     private String conceptoHtml;

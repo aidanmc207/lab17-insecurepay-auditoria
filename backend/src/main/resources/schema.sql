@@ -31,7 +31,7 @@ CREATE TABLE TRANSACCIONES (
     cuenta_origen_id BIGINT NOT NULL,
     cuenta_destino_id BIGINT NOT NULL,
     monto DECIMAL(15,2) NOT NULL,
-    concepto_html CLOB, -- [FALLO DE INYECCION]: Almacena HTML/Javascript arbitrario sin sanitizar
+    concepto_html CLOB, -- Texto plano codificado (ver TransaccionService.sanitizarTexto)
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     estado VARCHAR(20) NOT NULL DEFAULT 'COMPLETADA',
     CONSTRAINT fk_transaccion_origen FOREIGN KEY (cuenta_origen_id) REFERENCES CUENTAS_BANCARIAS(id),

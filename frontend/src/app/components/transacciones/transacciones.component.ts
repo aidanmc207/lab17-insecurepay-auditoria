@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BancoService } from '../../services/banco.service';
 import { AuthService } from '../../services/auth.service';
 import { Transaccion } from '../../models/banco.model';
@@ -16,16 +15,13 @@ import { Transaccion } from '../../models/banco.model';
 export class TransaccionesComponent implements OnInit {
   transacciones: Transaccion[] = [];
   transaccionSeleccionada: Transaccion | null = null;
-  conceptoSeguro: SafeHtml = '';
   terminoBusqueda = '';
   loading = false;
   errorInfo = '';
 
   constructor(
     private bancoService: BancoService,
-    public authService: AuthService,
-    // [VULNERABILIDAD INTENCIONADA: A03:2021 - Bypass de Sanitizacion XSS]
-    private sanitizer: DomSanitizer
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -74,20 +70,15 @@ export class TransaccionesComponent implements OnInit {
     this.ejecutarBusqueda();
   }
 
+  // [REMEDIACION A03:2021 - Stored XSS]
+  // Se elimina bypassSecurityTrustHtml: la plantilla muestra el concepto con
+  // interpolacion {{ }}, por lo que Angular lo trata siempre como texto plano.
   verComprobante(t: Transaccion): void {
     this.transaccionSeleccionada = t;
-    // [VULNERABILIDAD INTENCIONADA: Stored XSS Sink]
-    // Anula voluntariamente la sanitizacion nativa de Angular
-    if (t.conceptoHtml) {
-      this.conceptoSeguro = this.sanitizer.bypassSecurityTrustHtml(t.conceptoHtml);
-    } else {
-      this.conceptoSeguro = '';
-    }
   }
 
   cerrarComprobante(): void {
     this.transaccionSeleccionada = null;
-    this.conceptoSeguro = '';
   }
 }
 

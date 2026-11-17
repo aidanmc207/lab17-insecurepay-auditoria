@@ -114,11 +114,27 @@ public class TransaccionService {
         transaccion.setCuentaOrigen(cuentaOrigen);
         transaccion.setCuentaDestino(cuentaDestino);
         transaccion.setMonto(dto.getMonto());
-        transaccion.setConceptoHtml(dto.getConceptoHtml());
+        transaccion.setConceptoHtml(sanitizarTexto(dto.getConceptoHtml()));
         transaccion.setEstado("COMPLETADA");
 
         Transaccion guardada = transaccionRepository.save(transaccion);
         return convertirADto(guardada);
+    }
+
+    // [REMEDIACION A03:2021 - Stored XSS (CWE-79) - Defensa en profundidad]
+    // Codifica los caracteres con significado en HTML antes de persistir, de modo que
+    // ningun cliente (web, movil, reportes) reciba marcado ejecutable desde la BD.
+    // El '&' se reemplaza primero para no codificar dos veces las entidades generadas.
+    static String sanitizarTexto(String entrada) {
+        if (entrada == null) {
+            return "";
+        }
+        return entrada
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#x27;");
     }
 
     private List<TransaccionDto> filtrarVisibles(Stream<Transaccion> transacciones, Usuario usuario) {

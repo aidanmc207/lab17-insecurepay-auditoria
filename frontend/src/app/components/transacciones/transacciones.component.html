@@ -65,7 +65,7 @@
             <td><span class="badge badge-success">{{ t.estado }}</span></td>
             <td>
               <button class="btn btn-secondary btn-sm" (click)="verComprobante(t)">
-                Ver Recibo (XSS)
+                Ver Comprobante
               </button>
             </td>
           </tr>
@@ -78,7 +78,7 @@
   <div *ngIf="transaccionSeleccionada" class="card" style="border: 2px solid #f87171; background: #fffaf0;">
     <div class="card-header" style="border-bottom-color: #fecaca;">
       <div>
-        <span class="badge badge-danger">COMPROBANTE BANCARIO OFICIAL (SINK XSS ALMACENADO)</span>
+        <span class="badge badge-info">COMPROBANTE BANCARIO OFICIAL</span>
         <h3 style="margin-top: 6px;">Transacción #{{ transaccionSeleccionada.id }}</h3>
       </div>
       <button class="btn btn-secondary btn-sm" (click)="cerrarComprobante()">✕ Cerrar</button>
@@ -96,10 +96,9 @@
     </div>
 
     <div class="form-group">
-      <label style="color: #b91c1c;">Detalle del Concepto (Renderizado HTML en Directo - Bypass DomSanitizer):</label>
-      <div style="background: #ffffff; padding: 18px; border-radius: var(--radius); border: 2px dashed #ef4444; min-height: 70px;"
-           [innerHTML]="conceptoSeguro">
-      </div>
+      <label>Detalle del Concepto:</label>
+      <!-- REMEDIACION XSS: interpolacion {{ }} -> Angular codifica < > " & como texto plano -->
+      <div class="comprobante-concepto" style="background: #ffffff; padding: 18px; border-radius: var(--radius); border: 1px solid var(--border); min-height: 70px; white-space: pre-wrap;">{{ transaccionSeleccionada.conceptoHtml }}</div>
     </div>
   </div>
 </div>

@@ -17,8 +17,8 @@ INSERT INTO CUENTAS_BANCARIAS (usuario_id, numero_cuenta, tipo_cuenta, saldo, mo
 (5, 'CR05015202001026458903', 'AHORROS', 75000.00, 'CRC', TRUE);
 
 INSERT INTO TRANSACCIONES (cuenta_origen_id, cuenta_destino_id, monto, concepto_html, fecha, estado) VALUES
-(2, 3, 45000.00, '<p>Pago de servicios profesionales de programacion. <span style="color: green; font-weight: bold;">Verificado</span></p>', '2026-03-01 10:15:00', 'COMPLETADA'),
-(3, 4, 120000.00, '<p>Cancelacion cuota de alquiler oficina central. Factura electronica #8849.</p>', '2026-03-05 14:30:00', 'COMPLETADA'),
-(3, 2, 15000.00, '<p>Reembolso almuerzo equipo de trabajo.</p>', '2026-03-12 11:20:00', 'COMPLETADA'),
-(4, 2, 35000.00, '<p>Aporte fondo solidario cooperativo. <span style="color: blue;">Transferencia inmediata SINPE Movil</span></p>', '2026-03-20 09:45:00', 'COMPLETADA');
+(2, 3, 45000.00, 'Pago de servicios profesionales de programacion. Verificado', '2026-03-01 10:15:00', 'COMPLETADA'),
+(3, 4, 120000.00, 'Cancelacion cuota de alquiler oficina central. Factura electronica #8849.', '2026-03-05 14:30:00', 'COMPLETADA'),
+(3, 2, 15000.00, 'Reembolso almuerzo equipo de trabajo.', '2026-03-12 11:20:00', 'COMPLETADA'),
+(4, 2, 35000.00, 'Aporte fondo solidario cooperativo. Transferencia inmediata SINPE Movil', '2026-03-20 09:45:00', 'COMPLETADA');
 
