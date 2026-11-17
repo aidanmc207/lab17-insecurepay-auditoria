@@ -38,9 +38,10 @@ export class LoginComponent {
     });
   }
 
-  fillUser(user: string, pass: string): void {
+  // Solo precarga el usuario: ninguna contrasena se incluye en el bundle del frontend
+  fillUser(user: string): void {
     this.username = user;
-    this.password = pass;
+    this.password = '';
   }
 }
 

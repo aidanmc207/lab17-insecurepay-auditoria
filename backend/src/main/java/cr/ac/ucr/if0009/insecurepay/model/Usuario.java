@@ -13,8 +13,8 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    // [VULNERABILIDAD INTENCIONADA: A02:2021 - Cryptographic Failures]
-    // Contrasenas almacenadas en texto plano sin funcion de dispersion criptografica
+    // [REMEDIACION A02:2021 - Cryptographic Failures]
+    // Almacena unicamente el hash BCrypt de la contrasena (ver SecurityConfig)
     @Column(nullable = false, length = 100)
     private String password;
 

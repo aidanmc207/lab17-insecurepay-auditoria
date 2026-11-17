@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS USUARIOS;
 CREATE TABLE USUARIOS (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL, -- [FALLO CRIPTOGRAFICO]: Contrasenas en texto plano
+    password VARCHAR(100) NOT NULL, -- Hash BCrypt (60 caracteres)
     nombre_completo VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     rol VARCHAR(20) NOT NULL
