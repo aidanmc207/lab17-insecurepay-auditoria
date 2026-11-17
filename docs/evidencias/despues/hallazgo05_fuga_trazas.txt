@@ -1,0 +1,41 @@
+# HALLAZGO-05 - Fuga de trazas tecnicas y configuracion insegura
+Fecha de ejecucion: 2026-11-17 09:37:46
+
+### Error de sintaxis SQL provocado (termino=')
+$ curl -i -G http://localhost:8080/api/transacciones/buscar --data-urlencode "termino='" -H "Authorization: Bearer <TOKEN_CARLOS>"
+
+HTTP/1.1 200 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:45 GMT
+
+[]
+
+### Recurso inexistente (cuenta 999)
+$ curl -i http://localhost:8080/api/cuentas/999 -H "Authorization: Bearer <TOKEN_CARLOS>"
+
+HTTP/1.1 404 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/problem+json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:45 GMT
+
+{"type":"https://insecurepay.fi.cr/errores/recurso-no-encontrado","title":"Recurso no encontrado","status":404,"detail":"Cuenta bancaria no existe.","instance":"/api/cuentas/999","timestamp":"2026-11-17T15:37:46.147760300Z"}
+
+### Consola H2 expuesta
+$ curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/h2-console/
+
+HTTP 404
+
+### Secreto JWT en el repositorio
+$ grep -n -i "jwt" backend/src/main/resources/application.properties
+
+36:# [REMEDIACION A02:2021] Secreto JWT externalizado (minimo 256 bits = 32 bytes).
+37:# Si JWT_SECRET no esta definida, se genera una clave aleatoria efimera al iniciar
+39:jwt.secret=${JWT_SECRET:}
+40:jwt.expiration-ms=${JWT_EXPIRATION_MS:3600000}

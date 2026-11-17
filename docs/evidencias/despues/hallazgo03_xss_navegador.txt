@@ -1,0 +1,6 @@
+# Verificacion en navegador (Google Chrome headless + Playwright) - 2026-11-17T15:38:16.344Z
+1. Login como carlos_mora -> dashboard OK
+2. Movimientos visibles: 4. Se abre el comprobante de la transaccion #5
+3. innerHTML del contenedor del concepto: Pago de Servicios &amp;lt;img src=&amp;quot;x&amp;quot; onerror=&amp;quot;alert(localStorage.insecure_pay_user)&amp;quot;&amp;gt;
+4. Elementos <img> inyectados en el comprobante: 0
+5. RESULTADO: ningun alert() se ejecuto; el payload se muestra como texto plano.

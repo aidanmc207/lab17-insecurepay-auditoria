@@ -1,0 +1,12 @@
+{
+  "name": "insecurepay-poc-navegador",
+  "private": true,
+  "description": "PoC en navegador real (Chrome headless) para HALLAZGO-02 y HALLAZGO-03",
+  "scripts": {
+    "xss": "node xss_check.js comprobante.png comprobante.txt",
+    "idor": "node idor_check.js idor.png"
+  },
+  "dependencies": {
+    "playwright-core": "1.52.0"
+  }
+}

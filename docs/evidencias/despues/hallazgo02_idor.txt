@@ -1,0 +1,55 @@
+# HALLAZGO-02 - IDOR/BOLA en consulta de cuentas, saldo y transferencias
+Fecha de ejecucion: 2026-11-17 09:37:44
+Atacante: carlos_mora (propietario de la cuenta ID 2). Victima: maria_rojas (cuenta ID 3).
+
+### Consulta de cuenta ajena (ID 3) con token de Carlos
+$ curl -i http://localhost:8080/api/cuentas/3 -H "Authorization: Bearer <TOKEN_CARLOS>"
+
+HTTP/1.1 403 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/problem+json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:44 GMT
+
+{"type":"https://insecurepay.fi.cr/errores/acceso-denegado","title":"Acceso denegado","status":403,"detail":"Acceso no autorizado a cuenta ajena.","instance":"/api/cuentas/3","timestamp":"2026-11-17T15:37:44.668991400Z"}
+
+### Consulta de saldo ajeno (ID 3) con token de Carlos
+$ curl -i http://localhost:8080/api/cuentas/3/saldo -H "Authorization: Bearer <TOKEN_CARLOS>"
+
+HTTP/1.1 403 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/problem+json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:44 GMT
+
+{"type":"https://insecurepay.fi.cr/errores/acceso-denegado","title":"Acceso denegado","status":403,"detail":"Acceso no autorizado a cuenta ajena.","instance":"/api/cuentas/3/saldo","timestamp":"2026-11-17T15:37:44.729544300Z"}
+
+### Consulta sin token (ID 3)
+$ curl -i http://localhost:8080/api/cuentas/3
+
+HTTP/1.1 401 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/problem+json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:44 GMT
+
+{"type":"https://insecurepay.fi.cr/errores/no-autenticado","title":"No autenticado","status":401,"detail":"Cabecera de autorizacion ausente o invalida.","instance":"/api/cuentas/3","timestamp":"2026-11-17T15:37:44.785091600Z"}
+
+### Transferencia DESDE la cuenta de Maria (ID 3) HACIA la cuenta de Carlos
+$ curl -i -X POST http://localhost:8080/api/transacciones/transferir -H "Authorization: Bearer <TOKEN_CARLOS>" -H "Content-Type: application/json" -d '{"cuentaOrigenId":3,"numeroCuentaDestino":"CR05015202001026458901","monto":100000,"conceptoHtml":"Retiro no autorizado"}'
+
+HTTP/1.1 403 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/problem+json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:44 GMT
+
+{"type":"https://insecurepay.fi.cr/errores/acceso-denegado","title":"Acceso denegado","status":403,"detail":"Fraude detectado: no puede debitar fondos de cuentas ajenas.","instance":"/api/transacciones/transferir","timestamp":"2026-11-17T15:37:44.849646500Z"}

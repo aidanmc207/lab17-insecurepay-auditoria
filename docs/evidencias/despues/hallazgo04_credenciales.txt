@@ -1,0 +1,52 @@
+# HALLAZGO-04 - Credenciales en texto plano / enumeracion de usuarios
+Fecha de ejecucion: 2026-11-17 09:37:45
+
+### Contrasenas almacenadas en el script de inicializacion
+$ grep -n "INSERT INTO USUARIOS" -A 6 backend/src/main/resources/data.sql
+
+7:INSERT INTO USUARIOS (username, password, nombre_completo, email, rol) VALUES
+8-('admin', '$2a$12$Q28.EcKoIqkdez9fiv/mlO191R7VtliwOyV9PCtb9pMtQZvNHFDUa', 'Administrador General de Sistemas', 'admin@insecurepay.fi.cr', 'ADMIN'),
+9-('auditor_seguridad', '$2a$12$x12743px0Bp8fHdWXAcesek2p0pgyOG./Gg4eXQE8fXJrI6zsAJBu', 'Lic. Esteban Solano Chaves', 'esolano@insecurepay.fi.cr', 'AUDITOR'),
+10-('carlos_mora', '$2a$12$G3tR6CUiTr08OWS5iXFipOLtQJthh10um6OnLGp39Db5PNi8PTcYK', 'Carlos Mora Morales', 'cmora@correo.cr', 'CLIENTE'),
+11-('maria_rojas', '$2a$12$CIJDczMzEj1vaxKui1hYgO5h6ybcLVNVVMrkn.ZeI25dp.SDE69sy', 'María Rojas Soto', 'mrojas@empresa.cr', 'CLIENTE'),
+12-('juan_perez', '$2a$12$FJjaJZm0OY7POCqiBBLVXu5vKRBluqgfzT/s/O5PZ8Dl.g4NXwBLm', 'Juan Pérez Delgado', 'jperez@correo.cr', 'CLIENTE');
+13-
+
+### Login valido (carlos_mora)
+$ curl -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d '{"username":"carlos_mora","password":"carlos123"}'
+
+HTTP/1.1 200 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:44 GMT
+
+{"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYXJsb3NfbW9yYSIsInJvbCI6IkNMSUVOVEUiLCJ1c3VhcmlvSWQiOjMsImlhdCI6MTc5NDkyOTg2NSwiZXhwIjoxNzk0OTMzNDY1fQ.CrsWw2J0uR5pxWPjfbRCragTCCpLW29tJvTu0Kp24kg","username":"carlos_mora","nombreCompleto":"Carlos Mora Morales","rol":"CLIENTE","usuarioId":3}
+
+### Login con contrasena incorrecta
+$ curl -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d '{"username":"carlos_mora","password":"incorrecta"}'
+
+HTTP/1.1 401 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/problem+json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:45 GMT
+
+{"type":"https://insecurepay.fi.cr/errores/credenciales-invalidas","title":"Credenciales invalidas","status":401,"detail":"Usuario o contrasena incorrectos.","instance":"/api/auth/login","timestamp":"2026-11-17T15:37:45.665346300Z"}
+
+### Login con usuario inexistente (enumeracion)
+$ curl -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d '{"username":"no_existe","password":"x"}'
+
+HTTP/1.1 401 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/problem+json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:45 GMT
+
+{"type":"https://insecurepay.fi.cr/errores/credenciales-invalidas","title":"Credenciales invalidas","status":401,"detail":"Usuario o contrasena incorrectos.","instance":"/api/auth/login","timestamp":"2026-11-17T15:37:45.984120400Z"}

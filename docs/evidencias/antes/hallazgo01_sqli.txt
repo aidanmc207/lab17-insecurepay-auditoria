@@ -1,5 +1,5 @@
 # HALLAZGO-01 - SQL Injection en /api/transacciones/buscar
-Fecha de ejecucion: 2026-11-17 09:24:45
+Fecha de ejecucion: 2026-11-17 09:38:51
 
 ### Busqueda legitima (termino=alquiler)
 $ curl -G http://localhost:8080/api/transacciones/buscar --data-urlencode "termino=alquiler" -H "Authorization: Bearer <TOKEN_CARLOS>"
@@ -10,7 +10,7 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Tue, 17 Nov 2026 15:24:45 GMT
+Date: Tue, 17 Nov 2026 15:38:50 GMT
 
 [{"id":2,"cuentaOrigenId":3,"numeroCuentaOrigen":"CR05015202001026458902","titularOrigen":"María Rojas Soto","cuentaDestinoId":4,"numeroCuentaDestino":"CR05015202001026458903","titularDestino":"Juan Pérez Delgado","monto":120000.00,"conceptoHtml":"<p>Cancelacion cuota de alquiler oficina central. Factura electronica #8849.</p>","fecha":"2026-03-05T14:30:00","estado":"COMPLETADA"}]
 
@@ -23,6 +23,6 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Tue, 17 Nov 2026 15:24:45 GMT
+Date: Tue, 17 Nov 2026 15:38:50 GMT
 
 [{"id":1,"cuentaOrigenId":2,"numeroCuentaOrigen":"CR05015202001026458901","titularOrigen":"Carlos Mora Morales","cuentaDestinoId":3,"numeroCuentaDestino":"CR05015202001026458902","titularDestino":"María Rojas Soto","monto":45000.00,"conceptoHtml":"<p>Pago de servicios profesionales de programacion. <span style=\"color: green; font-weight: bold;\">Verificado</span></p>","fecha":"2026-03-01T10:15:00","estado":"COMPLETADA"},{"id":2,"cuentaOrigenId":3,"numeroCuentaOrigen":"CR05015202001026458902","titularOrigen":"María Rojas Soto","cuentaDestinoId":4,"numeroCuentaDestino":"CR05015202001026458903

