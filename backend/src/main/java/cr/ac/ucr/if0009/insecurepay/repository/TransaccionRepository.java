@@ -16,7 +16,7 @@ public interface TransaccionRepository extends JpaRepository<Transaccion, Long> 
     // Consulta JPQL declarativa con parametro con nombre (:termino). Hibernate lo envia
     // al motor como parametro vinculado (PreparedStatement), nunca como parte del SQL.
     @Query("SELECT t FROM Transaccion t " +
-           "WHERE LOWER(t.conceptoHtml) LIKE LOWER(CONCAT('%', :termino, '%')) " +
+           "WHERE LOWER(CAST(t.conceptoHtml AS String)) LIKE LOWER(CONCAT('%', :termino, '%')) " +
            "   OR LOWER(t.estado) LIKE LOWER(CONCAT('%', :termino, '%')) " +
            "ORDER BY t.fecha DESC")
     List<Transaccion> buscarPorTerminoSeguro(@Param("termino") String termino);
