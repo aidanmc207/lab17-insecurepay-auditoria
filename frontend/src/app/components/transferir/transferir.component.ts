@@ -13,12 +13,12 @@ import { Cuenta, TransferenciaRequest } from '../../models/banco.model';
   templateUrl: './transferir.component.html'
 })
 export class TransferirComponent implements OnInit {
-  todasLasCuentas: Cuenta[] = [];
+  misCuentas: Cuenta[] = [];
   transferencia: TransferenciaRequest = {
-    cuentaOrigenId: 2, // Por defecto cuenta de Maria Rojas (IDOR audit vector!)
-    numeroCuentaDestino: 'CR05015202001026458901', // Cuenta de Carlos Mora
-    monto: 50000,
-    conceptoHtml: '<p>Transferencia por servicios prestados.</p>'
+    cuentaOrigenId: 0,
+    numeroCuentaDestino: '',
+    monto: 0,
+    conceptoHtml: ''
   };
 
   loading = false;
@@ -32,9 +32,18 @@ export class TransferirComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.bancoService.listarTodasLasCuentas().subscribe({
+    // [REMEDIACION IDOR] Solo se ofrecen como origen las cuentas del usuario autenticado
+    const user = this.authService.currentUser();
+    if (!user) return;
+    this.bancoService.obtenerCuentasUsuario(user.usuarioId).subscribe({
       next: (cuentas) => {
-        this.todasLasCuentas = cuentas;
+        this.misCuentas = cuentas;
+        if (cuentas.length > 0) {
+          this.transferencia.cuentaOrigenId = cuentas[0].id;
+        }
+      },
+      error: (err) => {
+        this.errorMsg = 'No fue posible cargar sus cuentas: ' + (err.error?.message || err.message);
       }
     });
   }

@@ -1,7 +1,10 @@
 package cr.ac.ucr.if0009.insecurepay.service;
 
 import cr.ac.ucr.if0009.insecurepay.dto.CuentaDto;
+import cr.ac.ucr.if0009.insecurepay.exception.AccesoDenegadoException;
+import cr.ac.ucr.if0009.insecurepay.exception.RecursoNoEncontradoException;
 import cr.ac.ucr.if0009.insecurepay.model.CuentaBancaria;
+import cr.ac.ucr.if0009.insecurepay.model.Usuario;
 import cr.ac.ucr.if0009.insecurepay.repository.CuentaRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,30 +15,46 @@ import java.util.stream.Collectors;
 public class CuentaService {
 
     private final CuentaRepository cuentaRepository;
+    private final SesionService sesionService;
 
-    public CuentaService(CuentaRepository cuentaRepository) {
+    public CuentaService(CuentaRepository cuentaRepository, SesionService sesionService) {
         this.cuentaRepository = cuentaRepository;
+        this.sesionService = sesionService;
     }
 
-    // [VULNERABILIDAD INTENCIONADA: A01:2021 - Broken Access Control]
-    // Retorna todas las cuentas del banco sin verificar privilegios de administrador
-    public List<CuentaDto> listarTodas() {
+    // [REMEDIACION A01:2021 - Broken Access Control]
+    // El listado global de cuentas queda restringido a ADMIN / AUDITOR.
+    public List<CuentaDto> listarTodas(String authHeader) {
+        Usuario usuario = sesionService.obtenerUsuarioAutenticado(authHeader);
+        if (!sesionService.esPrivilegiado(usuario)) {
+            throw new AccesoDenegadoException("Acceso no autorizado al listado global de cuentas.");
+        }
         return cuentaRepository.findAll().stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
 
-    // [VULNERABILIDAD INTENCIONADA: A01:2021 - IDOR (Insecure Direct Object Reference)]
-    // Permite consultar los fondos y datos de cualquier cuenta bancaria alterando el {id}
-    public CuentaDto obtenerPorId(Long id) {
-        CuentaBancaria cuenta = cuentaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cuenta bancaria no encontrada con ID: " + id));
+    // [REMEDIACION A01:2021 - IDOR (CWE-639)]
+    // Se valida que la cuenta pertenezca al usuario del token antes de exponerla.
+    public CuentaDto obtenerCuentaSegura(Long cuentaId, String authHeader) {
+        Usuario usuario = sesionService.obtenerUsuarioAutenticado(authHeader);
+
+        CuentaBancaria cuenta = cuentaRepository.findById(cuentaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cuenta bancaria no existe."));
+
+        if (!sesionService.esPropietario(usuario, cuenta) && !sesionService.esPrivilegiado(usuario)) {
+            throw new AccesoDenegadoException("Acceso no autorizado a cuenta ajena.");
+        }
         return convertirADto(cuenta);
     }
 
-    // [VULNERABILIDAD INTENCIONADA: A01:2021 - BOLA]
-    // Permite listar todas las cuentas de cualquier cliente alterando el usuarioId
-    public List<CuentaDto> obtenerPorUsuario(Long usuarioId) {
+    // [REMEDIACION A01:2021 - BOLA]
+    // Un cliente solo puede listar sus propias cuentas aunque altere el usuarioId de la URL.
+    public List<CuentaDto> obtenerPorUsuario(Long usuarioId, String authHeader) {
+        Usuario usuario = sesionService.obtenerUsuarioAutenticado(authHeader);
+        if (!usuario.getId().equals(usuarioId) && !sesionService.esPrivilegiado(usuario)) {
+            throw new AccesoDenegadoException("Acceso no autorizado a cuentas de otro cliente.");
+        }
         return cuentaRepository.findByUsuarioId(usuarioId).stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
@@ -54,4 +73,3 @@ public class CuentaService {
         return dto;
     }
 }
-

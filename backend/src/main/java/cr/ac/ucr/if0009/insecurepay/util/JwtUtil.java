@@ -44,6 +44,14 @@ public class JwtUtil {
                 .getPayload();
     }
 
+    /**
+     * Extrae el username (claim "sub") de un token cuya firma y expiracion son validas.
+     * Lanza una excepcion de JJWT si el token fue alterado o expiro.
+     */
+    public String extraerUsername(String token) {
+        return getClaims(token).getSubject();
+    }
+
     public boolean validateToken(String token) {
         try {
             getClaims(token);
