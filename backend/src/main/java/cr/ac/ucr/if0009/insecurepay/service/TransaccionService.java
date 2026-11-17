@@ -6,8 +6,6 @@ import cr.ac.ucr.if0009.insecurepay.model.CuentaBancaria;
 import cr.ac.ucr.if0009.insecurepay.model.Transaccion;
 import cr.ac.ucr.if0009.insecurepay.repository.CuentaRepository;
 import cr.ac.ucr.if0009.insecurepay.repository.TransaccionRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +18,6 @@ public class TransaccionService {
 
     private final TransaccionRepository transaccionRepository;
     private final CuentaRepository cuentaRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     public TransaccionService(TransaccionRepository transaccionRepository, CuentaRepository cuentaRepository) {
         this.transaccionRepository = transaccionRepository;
@@ -47,20 +42,14 @@ public class TransaccionService {
                 .collect(Collectors.toList());
     }
 
-    // [VULNERABILIDAD INTENCIONADA: A03:2021 - SQL Injection (SQLi)]
-    // Concatenacion insegura directa del parametro en createNativeQuery sin Prepared Statements
-    // Payload tipico de exfiltracion: ' OR '1'='1
-    @SuppressWarnings("unchecked")
+    // [REMEDIACION A03:2021 - SQL Injection (CWE-89)]
+    // Se elimina la concatenacion en createNativeQuery y se delega en una consulta JPQL
+    // parametrizada. El termino viaja como dato literal y no puede alterar la sentencia.
     public List<TransaccionDto> buscarPorConcepto(String termino) {
-        String sql = "SELECT * FROM TRANSACCIONES WHERE concepto_html LIKE '%" + termino 
-                   + "%' OR estado LIKE '%" + termino + "%'";
-
-        System.out.println("[AUDITORIA FORENSE INSECUREPAY] Ejecutando consulta SQL vulnerable: " + sql);
-
-        List<Transaccion> resultados = entityManager.createNativeQuery(sql, Transaccion.class)
-                .getResultList();
-
-        return resultados.stream()
+        if (termino == null || termino.trim().isEmpty()) {
+            return List.of();
+        }
+        return transaccionRepository.buscarPorTerminoSeguro(termino.trim()).stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
