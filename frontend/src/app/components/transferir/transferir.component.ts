@@ -43,7 +43,7 @@ export class TransferirComponent implements OnInit {
         }
       },
       error: (err) => {
-        this.errorMsg = 'No fue posible cargar sus cuentas: ' + (err.error?.message || err.message);
+        this.errorMsg = 'No fue posible cargar sus cuentas: ' + (err.error?.detail || 'intente de nuevo.');
       }
     });
   }
@@ -68,7 +68,7 @@ export class TransferirComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = 'Error en la transacción: ' + (err.error?.message || err.message);
+        this.errorMsg = 'Error en la transacción: ' + (err.error?.detail || 'intente de nuevo.');
       }
     });
   }

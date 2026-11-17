@@ -28,8 +28,8 @@
       </div>
     </div>
 
-    <!-- Exposición de Error / Stack Trace SQL -->
-    <div *ngIf="errorInfo" class="alert alert-danger" style="font-family: monospace; font-size: 13px; white-space: pre-wrap;">
+    <!-- Mensaje de error generico (sin detalles tecnicos) -->
+    <div *ngIf="errorInfo" class="alert alert-danger" >
       {{ errorInfo }}
     </div>
 

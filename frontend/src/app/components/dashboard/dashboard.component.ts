@@ -41,7 +41,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = 'Error al cargar cuentas: ' + (err.error?.message || err.message);
+        this.errorMsg = 'Error al cargar cuentas: ' + (err.error?.detail || 'intente de nuevo.');
       }
     });
   }
@@ -56,7 +56,7 @@ export class DashboardComponent implements OnInit {
         this.cuentaEspiada = cuenta;
       },
       error: (err) => {
-        this.auditErrorMsg = 'Fallo al consultar cuenta: ' + (err.error?.message || err.message);
+        this.auditErrorMsg = 'Fallo al consultar cuenta: ' + (err.error?.detail || 'intente de nuevo.');
       }
     });
   }

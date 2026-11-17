@@ -80,3 +80,8 @@ $RECYCLE.BIN/
 .LSOverride
 ._*
 
+
+# --- Secretos y variables de entorno ---
+.env
+*.env
+!.env.example

@@ -33,7 +33,7 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err.error?.message || 'Fallo de autenticacion. Verifique sus credenciales.';
+        this.errorMsg = err.error?.detail || 'Fallo de autenticacion. Verifique sus credenciales.';
       }
     });
   }

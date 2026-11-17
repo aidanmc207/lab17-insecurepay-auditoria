@@ -38,7 +38,7 @@ export class TransaccionesComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorInfo = 'Error al cargar historial: ' + (err.error?.message || err.message);
+        this.errorInfo = 'Error al cargar historial: ' + (err.error?.detail || 'intente de nuevo.');
       }
     });
   }
@@ -60,7 +60,7 @@ export class TransaccionesComponent implements OnInit {
       error: (err) => {
         this.loading = false;
         // [VULNERABILIDAD INTENCIONADA: A05:2021 - Fuga de Error SQL]
-        this.errorInfo = 'Fallo de Base de Datos (Stack Trace): ' + (err.error?.message || err.error?.trace || err.message);
+        this.errorInfo = 'No fue posible completar la busqueda: ' + (err.error?.detail || 'intente de nuevo.');
       }
     });
   }
